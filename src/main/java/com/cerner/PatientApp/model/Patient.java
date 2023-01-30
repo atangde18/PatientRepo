@@ -13,27 +13,38 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+/**
+ * Class representing a patient entity in the system
+ * 
+ * @author Akash Tangde
+ */
 @Entity
 @Table(name = "patients")
 public class Patient {
 
+	/**
+	 * Unique identifier for a patient
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer patientId;
+	private Long patientId;
 	private String firstName;
 	private String lastName;
 	private LocalDateTime dob;
 	private String gender;
 
+	/**
+	 * List of addresses associated with the patient
+	 */
 	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private List<Address> addresses;
 
-	public Integer getpatientId() {
+	public Long getpatientId() {
 		return patientId;
 	}
 
-	public void setpatientId(Integer patientId) {
+	public void setpatientId(Long patientId) {
 		this.patientId = patientId;
 	}
 
@@ -74,6 +85,10 @@ public class Patient {
 	}
 
 	public void setAddresses(List<Address> addresses) {
+		for (Address address : addresses) {
+			address.setPatient(this);
+			;
+		}
 		this.addresses = addresses;
 	}
 

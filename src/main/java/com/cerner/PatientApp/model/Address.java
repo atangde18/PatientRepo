@@ -12,29 +12,41 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Class representing a address entity in the system
+ * 
+ * @author Akash Tangde
+ */
 @Entity
 @Table(name = "Address")
 public class Address {
 
+	/**
+	 * Unique identifier for a patient
+	 */
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer addressId;
+	private Long addressId;
 	private String addressType;
 	private String street;
 	private String city;
 	private String state;
 	private String pinCode;
+	private String teleNumber;
 
+	/**
+	 * Patient associated with the address
+	 */
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "patient_id")
 	@JsonBackReference
 	private Patient patient;
 
-	public Integer getId() {
+	public Long getId() {
 		return addressId;
 	}
 
-	public void setId(Integer addressId) {
+	public void setId(Long addressId) {
 		this.addressId = addressId;
 	}
 
@@ -84,6 +96,14 @@ public class Address {
 
 	public void setPatient(Patient patient) {
 		this.patient = patient;
+	}
+	
+	public String getTeleNumber() {
+		return teleNumber;
+	}
+
+	public void setTeleNumber(String teleNumber) {
+		this.teleNumber = teleNumber;
 	}
 
 	public Address() {
