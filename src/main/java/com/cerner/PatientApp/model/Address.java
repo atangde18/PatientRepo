@@ -42,10 +42,6 @@ public class Address {
 	@JsonBackReference
 	private Patient patient;
 
-	public Long getId() {
-		return addressId;
-	}
-
 	public void setId(Long addressId) {
 		this.addressId = addressId;
 	}
@@ -104,6 +100,21 @@ public class Address {
 
 	public void setTeleNumber(String teleNumber) {
 		this.teleNumber = teleNumber;
+	}
+
+	
+	
+	public Address(Long id, String addressType, String street, String city, String state, String pinCode,
+			String teleNumber, Patient patient) {
+		super();
+		this.addressId = id;
+		this.addressType = addressType;
+		this.street = street;
+		this.city = city;
+		this.state = state;
+		this.pinCode = pinCode;
+		this.teleNumber = teleNumber;
+		this.patient = patient;
 	}
 
 	public Address() {

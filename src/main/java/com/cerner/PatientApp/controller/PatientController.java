@@ -24,7 +24,7 @@ import com.cerner.PatientApp.service.ServiceClass;
  * @author Akash Tangde
  */
 @RestController
-public class Controller {
+public class PatientController {
 
 	/**
 	 * Autowired ServiceClass object, to access its methods
@@ -42,7 +42,7 @@ public class Controller {
 	@PostMapping("/patient")
 	public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
 		Patient newpatient = serviceClass.createPatient(patient);
-		return new ResponseEntity<>(newpatient, HttpStatus.OK);
+		return new ResponseEntity<>(newpatient, HttpStatus.CREATED);
 	}
 
 	/**

@@ -25,25 +25,4 @@ public class RecordNotFoundException extends Exception {
 		super(exception);
 	}
 
-	/**
-	 * 
-	 * Constructs a new RecordNotFoundException with the specified detail message
-	 * and cause.
-	 * 
-	 * @param message the detail message
-	 * @param cause   the cause of the exception
-	 */
-	public RecordNotFoundException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-	/**
-	 * 
-	 * Constructs a new RecordNotFoundException with the specified cause.
-	 * 
-	 * @param cause the cause of the exception
-	 */
-	public RecordNotFoundException(Throwable cause) {
-		super(cause);
-	}
 }

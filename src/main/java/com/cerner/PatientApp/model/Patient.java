@@ -1,6 +1,6 @@
 package com.cerner.PatientApp.model;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -30,7 +30,7 @@ public class Patient {
 	private Long patientId;
 	private String firstName;
 	private String lastName;
-	private LocalDateTime dob;
+	private LocalDate dob;
 	private String gender;
 
 	/**
@@ -39,10 +39,6 @@ public class Patient {
 	@OneToMany(mappedBy = "patient", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private List<Address> addresses;
-
-	public Long getpatientId() {
-		return patientId;
-	}
 
 	public void setpatientId(Long patientId) {
 		this.patientId = patientId;
@@ -64,11 +60,11 @@ public class Patient {
 		this.lastName = lastName;
 	}
 
-	public LocalDateTime getDob() {
+	public LocalDate getDob() {
 		return dob;
 	}
 
-	public void setDob(LocalDateTime dob) {
+	public void setDob(LocalDate dob) {
 		this.dob = dob;
 	}
 
@@ -84,10 +80,10 @@ public class Patient {
 		return addresses;
 	}
 
+	
 	public void setAddresses(List<Address> addresses) {
-		for (Address address : addresses) {
-			address.setPatient(this);
-			;
+		for(Address address: addresses) {
+			address.setPatient(this);;
 		}
 		this.addresses = addresses;
 	}

@@ -105,6 +105,7 @@ public class ServiceClass {
 				existingAddress.setCity(updatedAddress.getCity());
 				existingAddress.setState(updatedAddress.getState());
 				existingAddress.setPinCode(updatedAddress.getPinCode());
+				existingAddress.setTeleNumber(updatedAddress.getTeleNumber());
 			}
 		}
 

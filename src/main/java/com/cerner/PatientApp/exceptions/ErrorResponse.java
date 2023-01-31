@@ -16,15 +16,6 @@ public class ErrorResponse {
 	 * message describing the error
 	 */
 	private String message;
-	
-	public ErrorResponse(int status, String message) {
-		this.status = status;
-		this.message = message;
-	}
-
-	public int getStatus() {
-		return status;
-	}
 
 	public void setStatus(int status) {
 		this.status = status;
