@@ -141,7 +141,7 @@ public class ServiceClass {
 			String result = "Patient with ID : " + id + " was deleted";
 			return result;
 		} catch (EmptyResultDataAccessException e) {
-			throw new RecordNotFoundException("Could find record with Id : " + id);
+			throw new RecordNotFoundException("Could not find record with Id : " + id);
 		}
 
 	}

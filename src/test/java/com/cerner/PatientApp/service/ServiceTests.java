@@ -1,10 +1,12 @@
 package com.cerner.PatientApp.service;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -21,6 +23,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -109,21 +112,8 @@ class ServiceTests {
 		Patient actualPatient = patientService.getPatientById(patientId);
 
 		// Then
-		assertAll(() -> assertEquals(actualPatient.getFirstName(), expectedpatient.getFirstName()),
-				() -> assertEquals(actualPatient.getLastName(), expectedpatient.getLastName()),
-				() -> assertEquals(actualPatient.getDob(), expectedpatient.getDob()),
-				() -> assertEquals(actualPatient.getGender(), expectedpatient.getGender()));
-
-		for (Address actualAddress : actualPatient.getAddresses()) {
-			Address expectedAddress = expectedpatient.getAddresses().stream()
-					.filter(a -> a.getAddressType().equals(actualAddress.getAddressType())).findFirst().orElse(null);
-			assertEquals(actualAddress.getAddressType(), expectedAddress.getAddressType());
-			assertEquals(actualAddress.getCity(), expectedAddress.getCity());
-			assertEquals(actualAddress.getPinCode(), expectedAddress.getPinCode());
-			assertEquals(actualAddress.getState(), expectedAddress.getState());
-			assertEquals(actualAddress.getStreet(), expectedAddress.getStreet());
-		}
-		// assertEquals(expectedpatient, actualPatient);
+		
+		assertEquals(expectedpatient, actualPatient);
 	}
 
 	@Test
@@ -177,6 +167,23 @@ class ServiceTests {
 
 		assertEquals(expectedpatient, returnedPatient);
 	}
+	
+	@Test
+	public void givenPatientName_whenPatientNotFound_thenThrowRecordNotFoundException() throws Exception {
+	    // Given
+	    String firstName = "J";
+	    String lastName = "D";
+	    Mockito.when(patientRepo.findByFirstName(firstName, lastName)).thenReturn(null);
+
+	    // When
+	    Exception exception = assertThrows(RecordNotFoundException.class, 
+	        () -> patientService.getPatientByName(firstName, lastName));
+
+	    // Then
+	    String expectedMessage = "Patient with first name : " + firstName + " and last name : " + lastName + " does not exist";
+	    String actualMessage = exception.getMessage();
+	    assertTrue(actualMessage.contains(expectedMessage));
+	}
 
 	@Test
 	public void testUpdatePatient_Success() throws RecordNotFoundException {
@@ -202,15 +209,15 @@ class ServiceTests {
 
 		// When
 		Patient updatedPatient = new Patient();
-		updatedPatient.setFirstName("J");
-		updatedPatient.setLastName("D");
+		updatedPatient.setFirstName("A");
+		updatedPatient.setLastName("T");
 		updatedPatient.setDob(LocalDate.of(2000, 01, 01));
 		updatedPatient.setGender("Male");
 		List<Address> updatedAddresses = new ArrayList<>();
 		Address updatedAddress = new Address();
 		updatedAddress.setAddressType("Home");
 		updatedAddress.setStreet("Main St");
-		updatedAddress.setCity("LA");
+		updatedAddress.setCity("L");
 		updatedAddress.setState("CA");
 		updatedAddress.setPinCode("12345");
 		updatedAddresses.add(updatedAddress);
@@ -219,17 +226,37 @@ class ServiceTests {
 
 		// Then
 		assertNotNull(result);
-		assertEquals("J", result.getFirstName());
-		assertEquals("D", result.getLastName());
+		assertEquals("A", result.getFirstName());
+		assertEquals("T", result.getLastName());
 		assertEquals(LocalDate.of(2000, 01, 01), result.getDob());
 		assertEquals("Male", result.getGender());
 		assertEquals(1, result.getAddresses().size());
 		assertEquals("Main St", result.getAddresses().get(0).getStreet());
-		assertEquals("LA", result.getAddresses().get(0).getCity());
+		assertEquals("L", result.getAddresses().get(0).getCity());
 		assertEquals("CA", result.getAddresses().get(0).getState());
 		assertEquals("12345", result.getAddresses().get(0).getPinCode());
 		verify(patientRepo, times(1)).findById(id);
 		verify(patientRepo, times(1)).save(existingPatient);
+	}
+	
+	@Test
+	public void testUpdatePatientById_RecordNotFoundException() {
+		// Given
+		Patient patient = new Patient();
+		Long patientId = 1L;
+
+		when(patientRepo.findById(patientId)).thenReturn(Optional.empty());
+
+		// When
+		RecordNotFoundException exception = assertThrows(RecordNotFoundException.class, () -> {
+			patientService.updatePatient(patientId, patient);
+		});
+		CustomExceptionHandler customExceptionHandler = new CustomExceptionHandler();
+		ResponseEntity<ErrorResponse> response = customExceptionHandler.handleException(exception);
+
+		// Then
+		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+		assertEquals("Patient with Id : " + patientId + " does not exist", response.getBody().getMessage());
 	}
 
 	@Test
@@ -260,6 +287,19 @@ class ServiceTests {
 		Optional<Patient> deletedPatient = patientRepo.findById(id);
 		assertFalse(deletedPatient.isPresent());
 		assertEquals("Patient with ID : " + id + " was deleted", result);
+	}
+	
+	@Test
+	public void testDeletePatient_RecordNotFoundException() {
+	    Long id = 1L;
+	    doThrow(new EmptyResultDataAccessException(0)).when(patientRepo).deleteById(id);
+	    
+	    try {
+	    	patientService.deletePatient(id);
+	        fail("Expected RecordNotFoundException not thrown");
+	    } catch (RecordNotFoundException e) {
+	        assertEquals("Could not find record with Id : " + id, e.getMessage());
+	    }
 	}
 
 	@Test

@@ -37,7 +37,7 @@ public class PatientController {
 	 * 
 	 * @param patient Patient object to be created
 	 * @return ResponseEntity<Patient> The newly created Patient object and HTTP
-	 *         status OK (200)
+	 *         status (201)
 	 */
 	@PostMapping("/patient")
 	public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
